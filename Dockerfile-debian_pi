@@ -1,0 +1,20 @@
+FROM node:24-bookworm-slim
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends bash ca-certificates git ripgrep \
+  procps libgomp1 curl\
+  && rm -rf /var/lib/apt/lists/*
+RUN npm install -g --ignore-scripts @earendil-works/pi-coding-agent && 
+RUN curl -LsSf https://llama.app/install.sh | bash
+RUN echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+RUN cd /root && git clone https://github.com/huggingface/pi-llama
+
+WORKDIR /workspace
+ENTRYPOINT ["bash"]
+
+
+# procps per avere il comando ´free´
+# libgomp1 per far funzionare llama.cpp
+# curl per installare llama.cpp da https://llama.app/install.sh (funziona ma crea un brutto file per errore)
+# per scaricare il modello aggiungi:
+# RUN mkdir -p /root/models/gemma-4-E2B && cd /root/models/gemma-4-E2B && cd /root/models/gemma-4-E2B && curl -LsSf https://huggingface.co/google/gemma-4-E2B-it-qat-q4_0-gguf/resolve/main/README.md -o README.md && curl -LsSf https://huggingface.co/google/gemma-4-E2B-it-qat-q4_0-gguf/resolve/main/gemma-4-E2B-it-mmproj.gguf -o gemma-4-E2B-it-mmproj.gguf && curl -LsSf https://huggingface.co/google/gemma-4-E2B-it-qat-q4_0-gguf/resolve/main/gemma-4-E2B_q4_0-it.gguf -o gemma-4-E2B_q4_0-it.gguf
